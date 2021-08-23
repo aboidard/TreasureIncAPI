@@ -1,4 +1,5 @@
 const pool = require('../config/db')
+const computePageParams = require('../services/utils');
 
 class Items {
     constructor(rows) {
@@ -17,13 +18,18 @@ class Items {
         return JSON.stringify(this.items)
     }
 
-    static async get(publicKey, callback) {
-        console.log(`get items ${publicKey}`)
+    static async get(publicKey, page = 0, limit, callback) {
+
+        const [limitParam, offset] = computePageParams(page, limit)
+
+        console.log(`get items (${publicKey}) limit : ${limitParam} | page : ${offset}`)
         const request = `SELECT items.* FROM items, users
                          WHERE items.user_id = users.id
-                            AND users.public_key = $1`
+                            AND users.public_key = $1
+                            ORDER BY items.id
+                            LIMIT $2 OFFSET $3`
 
-        const values = [publicKey]
+        const values = [publicKey, limitParam, offset]
         pool.query(request, values, (err, res) => {
             if (err) throw err
             if (res.rows.length != 0) {
@@ -32,6 +38,7 @@ class Items {
             callback()
         })
     }
+
     static async post(publicKey, items, callback) {
         console.log(`post items ${publicKey} : ${JSON.stringify(items)}`)
 

@@ -44,7 +44,7 @@ app.get('/user/:publicKey/items/', (req, res) => {
     //let private_key = req.get('X-PRIVATE-KEY')
 
     let Items = require('./models/items')
-    Items.get(req.params.publicKey, function (items) {
+    Items.get(req.params.publicKey, req.query.page, req.query.limit, function (items) {
         if (items != undefined) {
             res.setHeader('Content-Type', 'application/json');
             res.status(200).send(items.getItemsJson())
