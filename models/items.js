@@ -22,7 +22,7 @@ class Items {
 
         const [limitParam, offset] = computePageParams(page, limit)
 
-        console.log(`get items (${publicKey}) limit : ${limitParam} | page : ${offset}`)
+        console.log(`get items (${publicKey}) limit : ${limitParam} | offset : ${offset}`)
         const request = `SELECT items.* FROM items, users
                          WHERE items.user_id = users.id
                             AND users.public_key = $1

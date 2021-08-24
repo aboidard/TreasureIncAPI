@@ -49,7 +49,7 @@ app.get('/user/:publicKey/items/', (req, res) => {
             res.setHeader('Content-Type', 'application/json');
             res.status(200).send(items.getItemsJson())
         }
-        res.status(404).end()
+        res.status(204).end()
     })
 })
 
