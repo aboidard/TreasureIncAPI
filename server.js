@@ -11,8 +11,7 @@ console.log("running NODE_ENV : " + process.env.NODE_ENV)
 app.use(express.json())
 
 var corsOptions = {
-    origin: 'http://localhost:3000',
-    credentials: true,
+    origin: '*',
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 
