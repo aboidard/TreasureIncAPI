@@ -1,5 +1,5 @@
 const pool = require('../config/db')
-const computePageParams = require('../services/utils');
+let { computePageParams } = require('../services/utils.js')
 
 class Items {
     constructor(rows) {
@@ -53,7 +53,7 @@ class Items {
 
             for (let i in items) {
                 let item = items[i]
-                const requestText = `INSERT INTO items (name, description, price, rarity, graphics, user_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+                const requestText = `INSERT INTO items (name, description, price, rarity, graphics, user_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, description, price, rarity, graphics`
                 const requestValue = [item.name, item.description, item.price, item.rarity, item.graphics, idUser]
 
                 const resInsert = await client.query(requestText, requestValue)

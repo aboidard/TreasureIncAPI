@@ -24,16 +24,15 @@ app.get('/version', (req, res) => {
 
 app.get('/login/:publicKey', (req, res) => {
 
-    console.log("request login")
     let private_key = req.get('X-PRIVATE-KEY')
 
+    console.log(`request login ${req.params.publicKey} ${private_key}`)
+
+
     let User = require('./models/user')
-    User.get(req.params.publicKey, function (user) {
+    User.get(req.params.publicKey, private_key, function (user) {
         if (user != undefined) {
-            if (private_key === user.privateKey) {
-                res.status(200).send(user.getUserJson())
-                console.log("request login")
-            }
+            res.status(200).send(user.getUserJson())
         }
         res.status(404).end()
     })
@@ -48,6 +47,18 @@ app.get('/user/:publicKey/items/', (req, res) => {
         if (items != undefined) {
             res.setHeader('Content-Type', 'application/json');
             res.status(200).send(items.getItemsJson())
+        }
+        res.status(204).end()
+    })
+})
+app.get('/user/create/', (req, res) => {
+    console.log("request get new user")
+
+    let User = require('./models/user')
+    User.create(function (user) {
+        if (user != undefined) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).send(user.getUserJson())
         }
         res.status(204).end()
     })
