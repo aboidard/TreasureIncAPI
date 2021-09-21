@@ -22,6 +22,11 @@ app.get('/version', (req, res) => {
     res.status(200).send({ version: "0.0.1" })
 })
 
+app.get('/healthcheck', (req, res) => {
+    console.log("healthcheck")
+    res.status(200).send({ version: "0.0.1" })
+})
+
 app.get('/login/:publicKey', (req, res) => {
 
     let private_key = req.get('X-PRIVATE-KEY')
