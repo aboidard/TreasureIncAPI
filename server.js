@@ -86,6 +86,23 @@ app.post('/user/:publicKey/items/', (req, res) => {
     }
 })
 
+app.delete('/user/:publicKey/items/', (req, res) => {
+    console.log("request delete items")
+    if (req.body === undefined || req.body.length === 0) {
+        res.status(204).end()
+    } else {
+        let Items = require('./models/items')
+        Items.delete(req.params.publicKey, req.body, function (items) {
+            if (items != undefined) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).send(items.getItemsJson())
+                console.log("request items")
+            }
+            res.status(404).end()
+        })
+    }
+})
+
 console.log("Starting server...")
 app.listen(port, () => {
     console.log("Running on port " + port)
