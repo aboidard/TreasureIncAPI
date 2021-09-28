@@ -72,6 +72,37 @@ class Items {
         console.log(`post items end ${publicKey} : ${JSON.stringify(items)}`)
         callback(new Items(items))
     }
+
+    static async delete(publicKey, items, callback) {
+        console.log(`post items ${publicKey} : ${JSON.stringify(items)}`)
+
+        const client = await pool.connect()
+
+        try {
+            await client.query('BEGIN')
+
+            const queryUser = `SELECT users.id FROM users WHERE public_key = $1`
+            const res = await client.query(queryUser, [publicKey])
+            const idUser = res.rows[0].id
+
+            for (let i in items) {
+                let item = items[i]
+                const requestText = `DELETE FROM items WHERE id = $1 AND user_id = $2`
+                const requestValue = [item.id, idUser]
+
+                const resInsert = await client.query(requestText, requestValue)
+            }
+            await client.query('COMMIT')
+        } catch (e) {
+            await client.query('ROLLBACK')
+            console.log("ROLLBACK " + e)
+            throw e
+        } finally {
+            client.release()
+        }
+        console.log(`delete items end ${publicKey} : ${JSON.stringify(items)}`)
+        callback(new Items(items))
+    }
 }
 
 module.exports = Items
