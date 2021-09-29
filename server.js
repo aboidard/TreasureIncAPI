@@ -75,6 +75,7 @@ app.post('/user/:publicKey/items/', (req, res) => {
         res.status(204).end()
     } else {
         let Items = require('./models/items')
+        console.log(`req.body ${req.body}`)
         Items.post(req.params.publicKey, req.body, function (items) {
             if (items != undefined) {
                 res.setHeader('Content-Type', 'application/json');
@@ -86,12 +87,13 @@ app.post('/user/:publicKey/items/', (req, res) => {
     }
 })
 
-app.delete('/user/:publicKey/items/', (req, res) => {
+app.post('/user/:publicKey/sellitems/', (req, res) => {
     console.log("request delete items")
     if (req.body === undefined || req.body.length === 0) {
         res.status(204).end()
     } else {
         let Items = require('./models/items')
+        console.log(`req.body ${req.body}`)
         Items.delete(req.params.publicKey, req.body, function (items) {
             if (items != undefined) {
                 res.setHeader('Content-Type', 'application/json');
