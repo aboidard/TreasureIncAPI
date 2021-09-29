@@ -81,17 +81,32 @@ class Items {
         try {
             await client.query('BEGIN')
 
+            console.log(" récupération user ")
             const queryUser = `SELECT users.id FROM users WHERE public_key = $1`
             const res = await client.query(queryUser, [publicKey])
             const idUser = res.rows[0].id
 
+            let priceTotal = 0
             for (let i in items) {
+
+                console.log(" item " + i)
                 let item = items[i]
-                const requestText = `DELETE FROM items WHERE id = $1 AND user_id = $2`
+                const requestText = `DELETE FROM items WHERE id = $1 AND user_id = $2 RETURNING price`
                 const requestValue = [item.id, idUser]
 
-                const resInsert = await client.query(requestText, requestValue)
+                const resultSelling = await client.query(requestText, requestValue)
+
+                console.log(" resultSelling.rows " + resultSelling.rows)
+                priceTotal += resultSelling.rows[0].price
             }
+
+            console.log(" update priceTotal " + priceTotal)
+            //update money
+            const queryMoney = `UPDATE users SET money = money + $1 WHERE public_key = $2`
+            await client.query(queryMoney, [priceTotal, publicKey])
+
+
+            console.log(" COMMIT ")
             await client.query('COMMIT')
         } catch (e) {
             await client.query('ROLLBACK')
@@ -100,8 +115,8 @@ class Items {
         } finally {
             client.release()
         }
-        console.log(`delete items end ${publicKey} : ${JSON.stringify(items)}`)
-        callback(new Items(items))
+        console.log(`delete items end ${publicKey}`)
+        callback()
     }
 }
 

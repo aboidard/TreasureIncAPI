@@ -19,12 +19,12 @@ app.use(cors(corsOptions));
 
 app.get('/version', (req, res) => {
     console.log("request version")
-    res.status(200).send({ version: "0.0.1" })
+    res.status(200).send({ version: "0.0.2" })
 })
 
 app.get('/healthcheck', (req, res) => {
     console.log("healthcheck")
-    res.status(200).send({ version: "0.0.1" })
+    res.status(200).send({ version: "0.0.2" })
 })
 
 app.get('/login/:publicKey', (req, res) => {
@@ -94,16 +94,26 @@ app.post('/user/:publicKey/sellitems/', (req, res) => {
     } else {
         let Items = require('./models/items')
         console.log(`req.body ${req.body}`)
-        Items.delete(req.params.publicKey, req.body, function (items) {
-            if (items != undefined) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200).send(items.getItemsJson())
-                console.log("request items")
-            }
-            res.status(404).end()
+        Items.delete(req.params.publicKey, req.body, function () {
+            res.status(200).send()
+            console.log("request delete items")
         })
     }
 })
+
+app.post('/user/:publicKey/expedition/', (req, res) => {
+    console.log("request add expedition")
+    if (req.body === undefined || req.body.length === 0) {
+        res.status(204).end()
+    } else {
+        let Expedition = require('./models/Expedition')
+        console.log(`req.body ${req.body}`)
+        Expedition.create(req.params.publicKey, req.body, function () {
+            res.status(200).send()
+        })
+    }
+})
+
 
 console.log("Starting server...")
 app.listen(port, () => {
