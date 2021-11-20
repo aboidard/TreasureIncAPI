@@ -88,15 +88,12 @@ class Items {
 
             let priceTotal = 0
             for (let i in items) {
-
-                console.log(" item " + i)
                 let item = items[i]
                 const requestText = `DELETE FROM items WHERE id = $1 AND user_id = $2 RETURNING price`
                 const requestValue = [item.id, idUser]
 
                 const resultSelling = await client.query(requestText, requestValue)
 
-                console.log(" resultSelling.rows " + resultSelling.rows)
                 priceTotal += resultSelling.rows[0].price
             }
 
@@ -106,7 +103,6 @@ class Items {
             await client.query(queryMoney, [priceTotal, publicKey])
 
 
-            console.log(" COMMIT ")
             await client.query('COMMIT')
         } catch (e) {
             await client.query('ROLLBACK')
