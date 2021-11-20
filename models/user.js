@@ -66,6 +66,21 @@ class User {
         })
     }
 
+    static async getAll(callback) {
+        const request = 'SELECT * FROM users'
+        const values = []
+        let arrayResult = []
+        pool.query(request, values, (err, res) => {
+            if (err) throw err
+            if (res.rows.length != 0) {
+                arrayResult = []
+                res.rows.forEach((e) => arrayResult.push(new User(e)))
+                callback(arrayResult)
+            }
+            callback()
+        })
+    }
+
     static async create(callback) {
         const request = 'INSERT INTO users (public_key, private_key, money) values ($1, $2, $3) RETURNING public_key, private_key, money, created'
         const values = [generatePublicKey(11), generatePrivateKey(30), 100000]
