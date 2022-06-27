@@ -20,7 +20,7 @@ class Items {
 
 
     static async create(publicKey, expedition, callback) {
-        console.log(`post create expedition ${publicKey} : ${JSON.stringify(expedition)}`)
+        logger.info(`post create expedition ${publicKey} : ${JSON.stringify(expedition)}`)
 
         const client = await pool.connect()
 
@@ -33,12 +33,12 @@ class Items {
             await client.query('COMMIT')
         } catch (e) {
             await client.query('ROLLBACK')
-            console.log("ROLLBACK " + e)
+            logger.error("ROLLBACK " + e)
             throw e
         } finally {
             client.release()
         }
-        console.log(`post create expedition end ${publicKey}`)
+        logger.info(`post create expedition end ${publicKey}`)
         callback()
     }
 }

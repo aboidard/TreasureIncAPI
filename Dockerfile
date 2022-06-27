@@ -1,10 +1,17 @@
-FROM node:16
+FROM node:16-alpine
 
-WORKDIR /usr/src/app
-COPY package*.json ./
+# Global npm dependencies
+ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
+ENV PATH=$PATH:/home/node/.npm-global/bin
 
-RUN npm install
-COPY . .
+WORKDIR /app
+COPY --chown=node:node . ./
+
+RUN yarn install --frozen-lockfile --production
+
+USER node
+
 
 EXPOSE 8081
+
 CMD [ "node", "server.js" ]

@@ -1,13 +1,43 @@
 const express = require('express')
 const cors = require('cors');
+const { createLogger, format, transports } = require('winston');
 require('dotenv').config()
 
 const app = express()
 
 const port = process.env.SERVER_PORT
 
-console.log("running NODE_ENV : " + process.env.NODE_ENV)
+// logging
+const logger = createLogger({
+    level: 'info',
+    format: format.combine(
+        format.timestamp({
+            format: 'YYYY-MM-DD HH:mm:ss'
+        }),
+        format.errors({ stack: true }),
+        format.splat(),
+        //format.json()
+    ),
+    defaultMeta: { service: 'api' },
+    transports: [
+        new transports.File({ filename: 'treasure-inc-error.log', level: 'error' }),
+        new transports.File({ filename: 'treasure-inc.log' })
+    ]
+});
 
+// If we're not in production then **ALSO** log to the `console`
+// with the colorized simple format.
+
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(new transports.Console({
+        format: format.combine(
+            format.colorize(),
+            format.simple()
+        )
+    }));
+}
+
+logger.info(`running NODE_ENV :${process.env.NODE_ENV}`);
 app.use(express.json())
 
 var corsOptions = {
@@ -18,12 +48,12 @@ var corsOptions = {
 app.use(cors(corsOptions));
 
 app.get('/version', (req, res) => {
-    console.log("request version")
+    logger.info("request version")
     res.status(200).send({ version: "0.0.3" })
 })
 
 app.get('/healthcheck', (req, res) => {
-    console.log("healthcheck")
+    logger.info("healthcheck")
     res.status(200).send({ version: "0.0.3" })
 })
 
@@ -31,7 +61,7 @@ app.get('/login/:publicKey', (req, res) => {
 
     let private_key = req.get('X-PRIVATE-KEY')
 
-    console.log(`request login ${req.params.publicKey} ${private_key}`)
+    logger.info(`request login ${req.params.publicKey} ${private_key}`)
 
 
     let User = require('./models/user')
@@ -47,7 +77,7 @@ app.get('/users', (req, res) => {
 
     //let private_key = req.get('X-PRIVATE-KEY')
 
-    console.log(`request users`)
+    logger.info(`request users`)
 
 
     let User = require('./models/user')
@@ -60,7 +90,7 @@ app.get('/users', (req, res) => {
 })
 
 app.get('/user/:publicKey/items/', (req, res) => {
-    console.log("request get items")
+    logger.info("request get items")
     //let private_key = req.get('X-PRIVATE-KEY')
 
     let Items = require('./models/items')
@@ -73,7 +103,7 @@ app.get('/user/:publicKey/items/', (req, res) => {
     })
 })
 app.get('/user/create/', (req, res) => {
-    console.log("request get new user")
+    logger.info("request get new user")
 
     let User = require('./models/user')
     User.create(function (user) {
@@ -86,17 +116,17 @@ app.get('/user/create/', (req, res) => {
 })
 
 app.post('/user/:publicKey/items/', (req, res) => {
-    console.log("request post items")
+    logger.info("request post items")
     if (req.body === undefined || req.body.length === 0) {
         res.status(204).end()
     } else {
         let Items = require('./models/items')
-        console.log(`req.body ${req.body}`)
+        logger.info(`req.body ${req.body}`)
         Items.post(req.params.publicKey, req.body, function (items) {
             if (items != undefined) {
                 res.setHeader('Content-Type', 'application/json');
                 res.status(200).send(items.getItemsJson())
-                console.log("request items")
+                logger.info("request items")
             }
             res.status(404).end()
         })
@@ -104,26 +134,26 @@ app.post('/user/:publicKey/items/', (req, res) => {
 })
 
 app.post('/user/:publicKey/sellitems/', (req, res) => {
-    console.log("request delete items")
+    logger.info("request delete items")
     if (req.body === undefined || req.body.length === 0) {
         res.status(204).end()
     } else {
         let Items = require('./models/items')
-        console.log(`req.body ${req.body}`)
+        logger.info(`req.body ${req.body}`)
         Items.delete(req.params.publicKey, req.body, function () {
             res.status(200).send()
-            console.log("request delete items")
+            logger.info("request delete items")
         })
     }
 })
 
 app.post('/user/:publicKey/expedition/', (req, res) => {
-    console.log("request add expedition")
+    logger.info("request add expedition")
     if (req.body === undefined || req.body.length === 0) {
         res.status(204).end()
     } else {
         let Expedition = require('./models/Expedition')
-        console.log(`req.body ${req.body}`)
+        logger.info(`req.body ${req.body}`)
         Expedition.create(req.params.publicKey, req.body, function () {
             res.status(200).send()
         })
@@ -131,7 +161,7 @@ app.post('/user/:publicKey/expedition/', (req, res) => {
 })
 
 
-console.log("Starting server...")
+logger.info("Starting server...")
 app.listen(port, () => {
-    console.log("Running on port " + port)
+    logger.info("Running on port " + port)
 })
