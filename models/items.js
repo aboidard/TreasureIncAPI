@@ -22,7 +22,7 @@ class Items {
 
         const [limitParam, offset] = computePageParams(page, limit)
 
-        console.log(`get items (${publicKey}) limit : ${limitParam} | offset : ${offset}`)
+        logger.info(`get items (${publicKey}) limit : ${limitParam} | offset : ${offset}`)
         const request = `SELECT items.* FROM items, users
                          WHERE items.user_id = users.id
                             AND users.public_key = $1
@@ -40,7 +40,7 @@ class Items {
     }
 
     static async post(publicKey, items, callback) {
-        console.log(`post items ${publicKey} : ${JSON.stringify(items)}`)
+        logger.info(`post items ${publicKey} : ${JSON.stringify(items)}`)
 
         const client = await pool.connect()
 
@@ -64,24 +64,24 @@ class Items {
             await client.query('COMMIT')
         } catch (e) {
             await client.query('ROLLBACK')
-            console.log("ROLLBACK " + e)
+            logger.error("ROLLBACK " + e)
             throw e
         } finally {
             client.release()
         }
-        console.log(`post items end ${publicKey} : ${JSON.stringify(items)}`)
+        logger.info(`post items end ${publicKey} : ${JSON.stringify(items)}`)
         callback(new Items(items))
     }
 
     static async delete(publicKey, items, callback) {
-        console.log(`post items ${publicKey} : ${JSON.stringify(items)}`)
+        logger.info(`post items ${publicKey} : ${JSON.stringify(items)}`)
 
         const client = await pool.connect()
 
         try {
             await client.query('BEGIN')
 
-            console.log(" récupération user ")
+            logger.info(" récupération user ")
             const queryUser = `SELECT users.id FROM users WHERE public_key = $1`
             const res = await client.query(queryUser, [publicKey])
             const idUser = res.rows[0].id
@@ -97,7 +97,7 @@ class Items {
                 priceTotal += resultSelling.rows[0].price
             }
 
-            console.log(" update priceTotal " + priceTotal)
+            logger.info(" update priceTotal " + priceTotal)
             //update money
             const queryMoney = `UPDATE users SET money = money + $1 WHERE public_key = $2`
             await client.query(queryMoney, [priceTotal, publicKey])
@@ -106,12 +106,12 @@ class Items {
             await client.query('COMMIT')
         } catch (e) {
             await client.query('ROLLBACK')
-            console.log("ROLLBACK " + e)
+            logger.error("ROLLBACK " + e)
             throw e
         } finally {
             client.release()
         }
-        console.log(`delete items end ${publicKey}`)
+        logger.info(`delete items end ${publicKey}`)
         callback()
     }
 }

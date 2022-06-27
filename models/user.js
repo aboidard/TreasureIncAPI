@@ -50,7 +50,7 @@ class User {
         user['created'] = this.created
         user['money'] = this.money
 
-        console.log(JSON.stringify(user))
+        logger.info(JSON.stringify(user))
         return JSON.stringify(user)
     }
 
