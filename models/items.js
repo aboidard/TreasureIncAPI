@@ -1,4 +1,5 @@
 const pool = require('../config/db')
+const logger = require('../config/logger')
 let { computePageParams } = require('../services/utils.js')
 
 class Items {

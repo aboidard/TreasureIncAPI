@@ -5,3 +5,4 @@ node_modules
 .gitignore
 API.code-workspace
 README.md
+.env
