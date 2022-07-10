@@ -1,41 +1,11 @@
 const express = require('express')
-const cors = require('cors');
-const { createLogger, format, transports } = require('winston');
+const cors = require('cors')
+const logger = require('./config/logger')
 require('dotenv').config()
 
 const app = express()
 
 const port = process.env.SERVER_PORT
-
-// logging
-const logger = createLogger({
-    level: 'info',
-    format: format.combine(
-        format.timestamp({
-            format: 'YYYY-MM-DD HH:mm:ss'
-        }),
-        format.errors({ stack: true }),
-        format.splat(),
-        //format.json()
-    ),
-    defaultMeta: { service: 'api' },
-    transports: [
-        new transports.File({ filename: 'treasure-inc-error.log', level: 'error' }),
-        new transports.File({ filename: 'treasure-inc.log' })
-    ]
-});
-
-// If we're not in production then **ALSO** log to the `console`
-// with the colorized simple format.
-
-if (process.env.NODE_ENV !== 'production') {
-    logger.add(new transports.Console({
-        format: format.combine(
-            format.colorize(),
-            format.simple()
-        )
-    }));
-}
 
 logger.info(`running NODE_ENV :${process.env.NODE_ENV}`);
 app.use(express.json())

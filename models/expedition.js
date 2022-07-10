@@ -1,4 +1,5 @@
 const pool = require('../config/db')
+const logger = require('../config/logger')
 
 class Items {
     constructor() {

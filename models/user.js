@@ -1,5 +1,7 @@
 let pool = require('../config/db')
+const logger = require('../config/logger')
 let { generatePublicKey, generatePrivateKey } = require('../services/utils.js')
+
 
 class User {
     constructor(row) {
