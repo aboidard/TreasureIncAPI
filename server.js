@@ -1,11 +1,13 @@
 const express = require('express')
 const cors = require('cors')
 const logger = require('./config/logger')
+const pool = require('./config/db')
 require('dotenv').config()
 
 const app = express()
 
 const port = process.env.SERVER_PORT
+const version = process.env.VERSION
 
 logger.info(`running NODE_ENV :${process.env.NODE_ENV}`);
 app.use(express.json())
@@ -19,12 +21,24 @@ app.use(cors(corsOptions));
 
 app.get('/version', (req, res) => {
     logger.info("request version")
-    res.status(200).send({ version: "0.0.3" })
+    res.status(200).send({ version: version })
 })
 
 app.get('/healthcheck', (req, res) => {
     logger.info("healthcheck")
-    res.status(200).send({ version: "0.0.3" })
+    let check = {
+        version: version,
+        status: ""
+    }
+    pool.connect()
+        .then(() => {
+            check.status = "OK"
+            res?.status(200).send(check)
+        })
+        .catch(err => {
+            check.status = "connection error " + err.message
+            res?.status(500).send(check)
+        })
 })
 
 app.get('/login/:publicKey', (req, res) => {
