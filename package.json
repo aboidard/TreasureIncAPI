@@ -1,19 +1,25 @@
 {
-  "name": "treasureincapi",
-  "version": "1.0.0",
+  "name": "treasure-inc-api",
+  "version": "0.0.4",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aboidard/TreasureIncAPI.git"
+  },
+  "author": "Boidard Arnaud",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
+    "kafkajs": "^2.2.0",
+    "morgan": "^1.10.0",
     "nodemon": "^2.0.19",
     "pg": "^8.6.0",
     "winston": "^3.8.0"

@@ -26,4 +26,8 @@ function generatePrivateKey(length) {
     return result;
 }
 
-module.exports = { computePageParams, generatePublicKey, generatePrivateKey }
+function generateRandomString(len) {
+    return Math.random().toString(36).substring(2, len + 2);
+}
+
+module.exports = { computePageParams, generatePublicKey, generatePrivateKey, generateRandomString }

@@ -1,15 +1,29 @@
+require('dotenv').config()
+
 const express = require('express')
 const cors = require('cors')
 const logger = require('./config/logger')
 const pool = require('./config/db')
-require('dotenv').config()
+const { consume, produce } = require('./config/kafka')
+const fs = require('fs')
+const morgan = require('morgan')
+const path = require('path')
+
 
 const app = express()
+
+// Create a write stream (in append mode)
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), { flags: 'a' })
+
+// Setup the logger
+app.use(morgan('combined', { stream: accessLogStream }))
 
 const port = process.env.SERVER_PORT
 const version = process.env.VERSION
 
+logger.info("Starting server...")
 logger.info(`running NODE_ENV :${process.env.NODE_ENV}`);
+
 app.use(express.json())
 
 var corsOptions = {
@@ -71,6 +85,13 @@ app.get('/users', (req, res) => {
         }
         res.status(404).end()
     })
+})
+
+app.get('/kafka', (req, res) => {
+
+    logger.info(`request kafka`)
+
+    produce(req.query.message, res)
 })
 
 app.get('/user/:publicKey/items/', (req, res) => {
@@ -145,7 +166,11 @@ app.post('/user/:publicKey/expedition/', (req, res) => {
 })
 
 
-logger.info("Starting server...")
+// start the consumer, and log any errors
+consume().catch((err) => {
+    logger.error("error in consumer: ", err)
+})
+
 app.listen(port, () => {
     logger.info("Running on port " + port)
 })
