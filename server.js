@@ -59,22 +59,37 @@ app.get('/healthcheckKafka', (req, res) => {
     logger.info("healthcheck")
     let check = {
         version: version,
-        status: ""
+        dbStatus: "",
+        engineStatus: ""
     }
-    pool.connect()
+
+    let promiseEngine = async function (result) {
+        check.engineStatus = result.result.payload
+    }
+
+    let promiseDb = pool.connect()
         .then(() => {
-            check.status = "OK"
-        })
-        .catch(err => {
-            check.status = "connection error " + err.message
+            check.dbStatus = "OK"
+        }).catch(err => {
+            check.dbStatus = "connection error " + err.message
         })
 
-    produce("healthcheck", res)
+    produce("healthcheck", promiseEngine)
 
-    if (check.status != "OK")
-        res?.status(500).send(check)
-    else
-        res?.status(200).send(check)
+    Promise.all([promiseDb, promiseEngine]).then(() => {
+        res.status(200).send(check)
+    })
+})
+
+app.get('/kafka', (req, res) => {
+
+    logger.info(`request kafka`)
+
+    produce(req.query.message, function (result) {
+        res.status(result.status).send(result)
+    })
+
+    //logger.info(`status : ${check.status}`)
 })
 
 app.get('/login/:publicKey', (req, res) => {
@@ -107,13 +122,6 @@ app.get('/users', (req, res) => {
         }
         res.status(404).end()
     })
-})
-
-app.get('/kafka', (req, res) => {
-
-    logger.info(`request kafka`)
-
-    produce(req.query.message, res)
 })
 
 app.get('/user/:publicKey/items/', (req, res) => {

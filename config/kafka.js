@@ -10,7 +10,8 @@ const clientIdEngine = "treasure-inc-Engine"
 
 const brokers = ["localhost:9093"]
 
-const responses = Object.create(null);
+//const responses = Object.create(null);
+const callbacks = Object.create(null);
 
 const kafkaConsumer = new Kafka({ clientId: clientIdEngine, brokers })
 const kafkaProducer = new Kafka({ clientId: clientIdApi, brokers })
@@ -26,8 +27,8 @@ const consume = async () => {
         eachMessage: ({ message }) => {
             try {
                 const result = JSON.parse(message.value)
-                const res = responses[result.replyId]
-                res.status(200).send(result)
+                const callback = callbacks[result.replyId]
+                callback({ status: 200, result: result })
             } catch (err) {
                 logger.error(`could not read message ${err}`)
             }
@@ -37,12 +38,12 @@ const consume = async () => {
     logger.info("Consumer Started")
 }
 
-const produce = async (payload, res) => {
+const produce = async (payload, callback) => {
     await producer.connect()
 
     try {
         const replyId = generateRandomString(10)
-        responses[replyId] = res;
+        callbacks[replyId] = callback;
         await producer.send({
             topic: topic,
             messages: [
