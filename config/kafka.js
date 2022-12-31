@@ -18,7 +18,6 @@ const kafkaProducer = new Kafka({ clientId: clientIdApi, brokers })
 const consumer = kafkaConsumer.consumer({ groupId: clientIdEngine })
 const producer = kafkaProducer.producer({})
 
-// TODO : FIX IT
 const consume = async () => {
     logger.info("Starting consumer")
     await consumer.connect()
@@ -38,7 +37,6 @@ const consume = async () => {
     logger.info("Consumer Started")
 }
 
-
 const produce = async (payload, res) => {
     await producer.connect()
 
@@ -53,7 +51,7 @@ const produce = async (payload, res) => {
                 },
             ],
         })
-        // if the message is written successfully, log it and increment `i`
+        // if the message is written successfully, log it
         logger.info(`message sent ${replyId} | ${payload}`)
     } catch (err) {
         logger.error(`could not write message ${err}`)

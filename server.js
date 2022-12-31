@@ -55,6 +55,28 @@ app.get('/healthcheck', (req, res) => {
         })
 })
 
+app.get('/healthcheckKafka', (req, res) => {
+    logger.info("healthcheck")
+    let check = {
+        version: version,
+        status: ""
+    }
+    pool.connect()
+        .then(() => {
+            check.status = "OK"
+        })
+        .catch(err => {
+            check.status = "connection error " + err.message
+        })
+
+    produce("healthcheck", res)
+
+    if (check.status != "OK")
+        res?.status(500).send(check)
+    else
+        res?.status(200).send(check)
+})
+
 app.get('/login/:publicKey', (req, res) => {
 
     let private_key = req.get('X-PRIVATE-KEY')
