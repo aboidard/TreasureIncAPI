@@ -1,9 +1,9 @@
-let pool = require('../config/db')
-const logger = require('../config/logger')
-let { generatePublicKey, generatePrivateKey } = require('../services/utils.js')
+import pool from '../config/db'
+import logger from '../config/logger'
+import { generatePublicKey, generatePrivateKey } from '../services/utils'
 
 
-class User {
+export default class User {
     constructor(row) {
         this.id = row.id
         this.publicKey = row.public_key
@@ -103,4 +103,3 @@ class User {
         })
     }
 }
-module.exports = User

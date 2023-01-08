@@ -1,7 +1,7 @@
-const pool = require('../config/db')
-const logger = require('../config/logger')
+import pool from '../config/db'
+import logger from '../config/logger'
 
-class Items {
+export default class Expedition {
     constructor() {
         this.cost = 0
     }
@@ -43,5 +43,3 @@ class Items {
         callback()
     }
 }
-
-module.exports = Items

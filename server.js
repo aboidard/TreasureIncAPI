@@ -1,18 +1,24 @@
-require('dotenv').config()
+import dotenv from 'dotenv'
 
-const express = require('express')
-const cors = require('cors')
-const logger = require('./config/logger')
-const pool = require('./config/db')
-const { consume, produce } = require('./config/kafka')
-const fs = require('fs')
-const morgan = require('morgan')
-const path = require('path')
+import express from 'express'
+import cors from 'cors'
+import logger from './config/logger'
+import { consume } from './config/kafka'
+import fs from 'fs'
+import morgan from 'morgan'
+import path from 'path'
 
 
+import User from './models/user'
+import Items from './models/items'
+import Expedition from './models/Expedition'
+import healthcheck from './services/healthcheck'
+
+dotenv.config()
 const app = express()
 
 // Create a write stream (in append mode)
+const __dirname = path.resolve();
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), { flags: 'a' })
 
 // Setup the logger
@@ -38,58 +44,10 @@ app.get('/version', (req, res) => {
     res.status(200).send({ version: version })
 })
 
-app.get('/healthcheck', (req, res) => {
-    logger.info("healthcheck")
-    let check = {
-        version: version,
-        status: ""
-    }
-    pool.connect()
-        .then(() => {
-            check.status = "OK"
-            res?.status(200).send(check)
-        })
-        .catch(err => {
-            check.status = "connection error " + err.message
-            res?.status(500).send(check)
-        })
-})
-
-app.get('/healthcheckKafka', (req, res) => {
-    logger.info("healthcheck")
-    let check = {
-        version: version,
-        dbStatus: "",
-        engineStatus: ""
-    }
-
-    let promiseEngine = async function (result) {
-        check.engineStatus = result.result.payload
-    }
-
-    let promiseDb = pool.connect()
-        .then(() => {
-            check.dbStatus = "OK"
-        }).catch(err => {
-            check.dbStatus = "connection error " + err.message
-        })
-
-    produce("healthcheck", promiseEngine)
-
-    Promise.all([promiseDb, promiseEngine]).then(() => {
-        res.status(200).send(check)
+app.get('/healthcheck', (_, res) => {
+    healthcheck(version, function (status, message) {
+        res.status(status).send(message)
     })
-})
-
-app.get('/kafka', (req, res) => {
-
-    logger.info(`request kafka`)
-
-    produce(req.query.message, function (result) {
-        res.status(result.status).send(result)
-    })
-
-    //logger.info(`status : ${check.status}`)
 })
 
 app.get('/login/:publicKey', (req, res) => {
@@ -99,7 +57,6 @@ app.get('/login/:publicKey', (req, res) => {
     logger.info(`request login ${req.params.publicKey} ${private_key}`)
 
 
-    let User = require('./models/user')
     User.get(req.params.publicKey, private_key, function (user) {
         if (user != undefined) {
             res.status(200).send(user.getUserJson())
@@ -114,8 +71,6 @@ app.get('/users', (req, res) => {
 
     logger.info(`request users`)
 
-
-    let User = require('./models/user')
     User.getAll(function (arrayUsers) {
         if (arrayUsers != undefined) {
             res.status(200).send(arrayUsers)
@@ -128,7 +83,6 @@ app.get('/user/:publicKey/items/', (req, res) => {
     logger.info("request get items")
     //let private_key = req.get('X-PRIVATE-KEY')
 
-    let Items = require('./models/items')
     Items.get(req.params.publicKey, req.query.page, req.query.limit, function (items) {
         if (items != undefined) {
             res.setHeader('Content-Type', 'application/json');
@@ -140,7 +94,6 @@ app.get('/user/:publicKey/items/', (req, res) => {
 app.get('/user/create/', (req, res) => {
     logger.info("request get new user")
 
-    let User = require('./models/user')
     User.create(function (user) {
         if (user != undefined) {
             res.setHeader('Content-Type', 'application/json');
@@ -155,7 +108,6 @@ app.post('/user/:publicKey/items/', (req, res) => {
     if (req.body === undefined || req.body.length === 0) {
         res.status(204).end()
     } else {
-        let Items = require('./models/items')
         logger.info(`req.body ${req.body}`)
         Items.post(req.params.publicKey, req.body, function (items) {
             if (items != undefined) {
@@ -173,7 +125,6 @@ app.post('/user/:publicKey/sellitems/', (req, res) => {
     if (req.body === undefined || req.body.length === 0) {
         res.status(204).end()
     } else {
-        let Items = require('./models/items')
         logger.info(`req.body ${req.body}`)
         Items.delete(req.params.publicKey, req.body, function () {
             res.status(200).send()
@@ -187,7 +138,6 @@ app.post('/user/:publicKey/expedition/', (req, res) => {
     if (req.body === undefined || req.body.length === 0) {
         res.status(204).end()
     } else {
-        let Expedition = require('./models/Expedition')
         logger.info(`req.body ${req.body}`)
         Expedition.create(req.params.publicKey, req.body, function () {
             res.status(200).send()

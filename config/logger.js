@@ -1,6 +1,6 @@
-const { format, createLogger, transports } = require('winston');
+import { format, createLogger, transports } from 'winston'
 
-const logger = createLogger({
+export default createLogger({
     transports:
         [new transports.File({
             filename: 'logs/treasure-inc-api.log',
@@ -22,5 +22,3 @@ if (process.env.NODE_ENV !== 'production') {
     //         eol: '\r\n',
     //     }));
 }
-
-module.exports = logger;
