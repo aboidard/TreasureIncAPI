@@ -1,8 +1,8 @@
-const pool = require('../config/db')
-const logger = require('../config/logger')
-let { computePageParams } = require('../services/utils.js')
+import pool from '../config/db'
+import logger from '../config/logger'
+import { computePageParams } from '../services/utils.js'
 
-class Items {
+export default class Items {
     constructor(rows) {
         this.items = rows
     }
@@ -116,5 +116,3 @@ class Items {
         callback()
     }
 }
-
-module.exports = Items

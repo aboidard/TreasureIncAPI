@@ -1,6 +1,6 @@
-const { Kafka } = require("kafkajs")
-const { generateRandomString } = require("../services/utils.js")
-const logger = require('./logger')
+import { Kafka } from 'kafkajs'
+import { generateRandomString } from '../services/utils'
+import logger from './logger'
 
 const topic = "message-log"
 const topicResponse = "message-log-res"
@@ -10,7 +10,7 @@ const clientIdEngine = "treasure-inc-Engine"
 
 const brokers = ["localhost:9093"]
 
-const responses = Object.create(null);
+const callbacks = Object.create(null);
 
 const kafkaConsumer = new Kafka({ clientId: clientIdEngine, brokers })
 const kafkaProducer = new Kafka({ clientId: clientIdApi, brokers })
@@ -18,8 +18,7 @@ const kafkaProducer = new Kafka({ clientId: clientIdApi, brokers })
 const consumer = kafkaConsumer.consumer({ groupId: clientIdEngine })
 const producer = kafkaProducer.producer({})
 
-// TODO : FIX IT
-const consume = async () => {
+export const consume = async () => {
     logger.info("Starting consumer")
     await consumer.connect()
     await consumer.subscribe({ topic: topicResponse })
@@ -27,8 +26,8 @@ const consume = async () => {
         eachMessage: ({ message }) => {
             try {
                 const result = JSON.parse(message.value)
-                const res = responses[result.replyId]
-                res.status(200).send(result)
+                const callback = callbacks[result.replyId]
+                callback({ status: 200, result: result })
             } catch (err) {
                 logger.error(`could not read message ${err}`)
             }
@@ -38,13 +37,12 @@ const consume = async () => {
     logger.info("Consumer Started")
 }
 
-
-const produce = async (payload, res) => {
+export const produce = async (payload, callback) => {
     await producer.connect()
 
     try {
         const replyId = generateRandomString(10)
-        responses[replyId] = res;
+        callbacks[replyId] = callback;
         await producer.send({
             topic: topic,
             messages: [
@@ -53,11 +51,9 @@ const produce = async (payload, res) => {
                 },
             ],
         })
-        // if the message is written successfully, log it and increment `i`
+        // if the message is written successfully, log it
         logger.info(`message sent ${replyId} | ${payload}`)
     } catch (err) {
         logger.error(`could not write message ${err}`)
     }
 }
-
-module.exports = { produce, consume }
