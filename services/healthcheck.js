@@ -3,24 +3,29 @@ import pool from '../config/db'
 import { produce } from '../config/kafka'
 
 const healthcheck = async function (version, callback) {
-    var timeout = 1000000
+    var timeout = 1000
     logger.info("healthcheck")
+    console.log("--------------> healthcheck")
 
     //result to send
     let check = {
         version: version,
-        dbStatus: "",
-        engineStatus: ""
+        dbStatus: "KO",
+        engineStatus: "KO"
     }
 
     const funcEngine = async function (args) { check.engineStatus = args.result.payload }
 
     let start = Date.now();
     let promiseEngine = new Promise(function waitForEngine(resolve, reject) {
-        if (check.engineStatus !== "")
+        if (check.engineStatus !== "KO") {
+            console.log("OK")
             resolve("ok");
-        else if (timeout && (Date.now() - start) >= timeout)
-            reject(new Error("timeout"));
+        }
+        else if (timeout && (Date.now() - start) >= timeout) {
+            console.log("timeout")
+            reject("timeout")
+        }
         else {
             console.log("wait")
             setTimeout(waitForEngine.bind(this, resolve, reject), 30)
@@ -40,9 +45,11 @@ const healthcheck = async function (version, callback) {
     })
 
     //waiting for Engine and DB
-    Promise.all([promiseDb, promiseEngine]).then(() => {
+    Promise.race([promiseDb, promiseEngine]).then(() => {
         callback(200, check)
-    })
+    }).catch(() => {
+        callback(500, check)
+    }).finally(() => console.log("<-------------- end healthcheck"))
 }
 
 
