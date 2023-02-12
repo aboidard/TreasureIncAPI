@@ -1,14 +1,15 @@
-let pool = require('../config/db')
-const logger = require('../config/logger')
-let { generatePublicKey, generatePrivateKey } = require('../services/utils.js')
+import pool from '../config/db'
+import logger from '../config/logger'
+import { generatePublicKey, generatePrivateKey } from '../services/utils'
 
 
-class User {
+export default class User {
     constructor(row) {
         this.id = row.id
         this.publicKey = row.public_key
         this.privateKey = row.private_key
         this.money = row.money
+        this.diamond = row.diamond
         this.created = row.created
     }
 
@@ -27,6 +28,9 @@ class User {
     get money() {
         return this._money
     }
+    get diamond() {
+        return this._diamond
+    }
 
     set id(value) {
         this._id = value
@@ -40,6 +44,9 @@ class User {
     set money(value) {
         this._money = value
     }
+    set diamond(value) {
+        this._diamond = value
+    }
     set created(value) {
         this._created = value
     }
@@ -51,6 +58,7 @@ class User {
         user['privateKey'] = this.privateKey
         user['created'] = this.created
         user['money'] = this.money
+        user['diamond'] = this.diamond
 
         logger.info(JSON.stringify(user))
         return JSON.stringify(user)
@@ -95,4 +103,3 @@ class User {
         })
     }
 }
-module.exports = User
