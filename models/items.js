@@ -1,6 +1,6 @@
 import pool from '../config/db'
 import logger from '../config/logger'
-import { computePageParams } from '../services/utils.js'
+import { computePageParams } from '../services/utils'
 
 export default class Items {
     constructor(rows) {
