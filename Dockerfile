@@ -5,13 +5,14 @@ ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 ENV PATH=$PATH:/home/node/.npm-global/bin
 
 WORKDIR /app
-COPY --chown=node:node . ./
+COPY package*.json ./
 
 RUN yarn install --frozen-lockfile --production
 
-USER node
+COPY --chown=node:node . .
 
+USER node
 
 EXPOSE 8081
 
-CMD [ "node", "server.js" ]
+CMD [ "node --es-module-specifier-resolution=node", "server.js" ]
