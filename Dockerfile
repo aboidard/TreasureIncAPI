@@ -9,10 +9,10 @@ COPY package*.json ./
 
 RUN yarn install --frozen-lockfile --production
 
-COPY --chown=node:node . .
+COPY --chown=node:node . ./
 
 USER node
 
 EXPOSE 8081
 
-CMD [ "node --es-module-specifier-resolution=node", "server.js" ]
+CMD [ "node", "--es-module-specifier-resolution=node", "server.js" ]

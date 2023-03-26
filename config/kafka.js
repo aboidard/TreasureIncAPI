@@ -8,7 +8,7 @@ const topicResponse = "message-log-res"
 const clientIdApi = "treasure-inc-api"
 const clientIdEngine = "treasure-inc-Engine"
 
-const brokers = ["localhost:9093"]
+const brokers = process.env.BROKERS.split(',')
 
 const callbacks = Object.create(null);
 
