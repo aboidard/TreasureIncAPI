@@ -1,7 +1,7 @@
 import express from 'express'
 
 import logger from '../../config/logger'
-import Expedition from '../../models/Expedition'
+import Expedition from '../../models/expedition'
 
 const router = express.Router();
 
