@@ -8,13 +8,13 @@ import express from 'express'
 import checks from './routes/checks'
 import logger from './config/logger'
 import { consume } from './config/kafka'
-import users from './routes/V1/users'
-import items from './routes/V1/items'
-import expeditions from './routes/V1/expeditions'
-
+import userRoute from './routes/V1/userRoute'
+import itemRoute from './routes/V1/itemRoute'
+import expeditionRoute from './routes/V1/expeditionRoute'
 
 // loading conf
 dotenv.config()
+
 const port = process.env.SERVER_PORT
 
 logger.info("Starting server...")
@@ -37,9 +37,9 @@ app.use(cors({
 
 // routes setup
 app.use('/', checks);
-app.use('/V1/', users);
-app.use('/V1/', items);
-app.use('/V1/', expeditions);
+app.use('/V1/', userRoute);
+app.use('/V1/', itemRoute);
+app.use('/V1/', expeditionRoute);
 
 // start the consumer, and log any errors
 consume().catch((err) => {

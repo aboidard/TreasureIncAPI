@@ -3,7 +3,7 @@ import pool from '../config/db'
 import { produce } from '../config/kafka'
 
 const healthcheck = async function (version, callback) {
-    var timeout = 1000
+    var timeout = 5000
     logger.info("healthcheck")
     console.log("--------------> healthcheck")
 
@@ -14,12 +14,14 @@ const healthcheck = async function (version, callback) {
         engineStatus: "KO"
     }
 
-    const funcEngine = async function (args) { check.engineStatus = args.result.payload }
+    const funcEngine = async function (payload) {
+        check.engineStatus = payload
+    }
 
     let start = Date.now();
     let promiseEngine = new Promise(function waitForEngine(resolve, reject) {
         if (check.engineStatus !== "KO") {
-            console.log("OK")
+            console.log("engine OK")
             resolve("ok");
         }
         else if (timeout && (Date.now() - start) >= timeout) {
@@ -27,7 +29,7 @@ const healthcheck = async function (version, callback) {
             reject("timeout")
         }
         else {
-            console.log("wait")
+            console.log("wait engine")
             setTimeout(waitForEngine.bind(this, resolve, reject), 30)
         }
     })
@@ -35,19 +37,22 @@ const healthcheck = async function (version, callback) {
     let promiseDb = pool.connect()
 
     //check engine
-    produce("healthcheck", funcEngine)
+    produce({ type: "healthcheck", params: {} }, funcEngine)
 
     //check DB
-    promiseDb.then(() => {
+    promiseDb.then((value) => {
         check.dbStatus = "OK"
+        value.release()
     }).catch(err => {
         check.dbStatus = "connection error " + err.message
     })
 
     //waiting for Engine and DB
-    Promise.race([promiseDb, promiseEngine]).then(() => {
+    Promise.allSettled([promiseDb, promiseEngine]).then(() => {
         callback(200, check)
-    }).catch(() => {
+    }).catch((value) => {
+        value.forEach((value) => console.log(value.status))
+        check.engineStatus = value
         callback(500, check)
     }).finally(() => console.log("<-------------- end healthcheck"))
 }

@@ -27,7 +27,7 @@ export const consume = async () => {
             try {
                 const result = JSON.parse(message.value)
                 const callback = callbacks[result.replyId]
-                callback({ status: 200, result: result })
+                callback(result.payload)
             } catch (err) {
                 logger.error(`could not read message ${err}`)
             }

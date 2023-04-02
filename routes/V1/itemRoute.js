@@ -2,6 +2,7 @@
 import express from 'express'
 import logger from '../../config/logger'
 import Items from '../../models/items'
+import itemService from '../../services/itemService'
 
 const router = express.Router();
 
@@ -25,13 +26,13 @@ router.post('/user/:publicKey/items/', (req, res) => {
         res.status(204).end()
     } else {
         logger.info(`req.body ${req.body}`)
-        Items.post(req.params.publicKey, req.body, function (items) {
-            if (items != undefined) {
+        //Items.post(req.params.publicKey, req.body, function (items) {
+        itemService.addItem(req.params.publicKey, req.body.nb, function (payload) {
+            if (payload.status == 201) {
                 res.setHeader('Content-Type', 'application/json');
-                res.status(200).send(items.getItemsJson())
-                logger.info("request items")
+                res.status(201).send(payload.items.getItemsJson())
             }
-            res.status(404).end()
+            res.status(payload.status).end(payload.message)
         })
     }
 })
