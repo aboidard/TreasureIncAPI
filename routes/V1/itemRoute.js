@@ -27,12 +27,13 @@ router.post('/user/:publicKey/items/', (req, res) => {
     } else {
         logger.info(`req.body ${req.body}`)
         //Items.post(req.params.publicKey, req.body, function (items) {
-        itemService.addItem(req.params.publicKey, req.body.nb, function (payload) {
-            if (payload.status == 201) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(201).send(payload.items.getItemsJson())
+        itemService.addItem(req.params.publicKey, req.body.nb, function (result) {
+            if (result.status == 201) {
+                res.setHeader('Content-Type', 'application/json')
+                res.status(201).send(result.payload.items)
+            } else {
+                res.status(result.status).end(result.message)
             }
-            res.status(payload.status).end(payload.message)
         })
     }
 })

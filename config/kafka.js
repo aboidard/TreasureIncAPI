@@ -10,7 +10,7 @@ const clientIdEngine = "treasure-inc-Engine"
 
 const brokers = process.env.BROKERS.split(',')
 
-const callbacks = Object.create(null);
+const callbacks = Object.create([]);
 
 const kafkaConsumer = new Kafka({ clientId: clientIdEngine, brokers })
 const kafkaProducer = new Kafka({ clientId: clientIdApi, brokers })
@@ -25,11 +25,17 @@ export const consume = async () => {
     await consumer.run({
         eachMessage: ({ message }) => {
             try {
+                logger.info(`message recieved ${message}`)
                 const result = JSON.parse(message.value)
                 const callback = callbacks[result.replyId]
+                if (!callback) {
+                    logger.error(`consume : no callback for message ${result.replyId}`)
+                    return
+                }
                 callback(result.payload)
             } catch (err) {
-                logger.error(`could not read message ${err}`)
+                logger.error(`consume : could not read message ${err}`)
+                callback({ status: "500", message: `could not read message : ${err}` })
             }
         },
     })

@@ -10,7 +10,7 @@ export default class User {
         this.privateKey = row.private_key
         this.money = row.money
         this.diamond = row.diamond
-        this.created = row.created
+        this.createdAt = row.createdAt
     }
 
     get publicKey() {
@@ -19,8 +19,8 @@ export default class User {
     get privateKey() {
         return this._privateKey
     }
-    get created() {
-        return this._created
+    get createdAt() {
+        return this._createdAt
     }
     get id() {
         return this._id
@@ -47,8 +47,8 @@ export default class User {
     set diamond(value) {
         this._diamond = value
     }
-    set created(value) {
-        this._created = value
+    set createdAt(value) {
+        this._createdAt = value
     }
 
 
@@ -56,7 +56,7 @@ export default class User {
         let user = {}
         user['publicKey'] = this.publicKey
         user['privateKey'] = this.privateKey
-        user['created'] = this.created
+        user['createdAt'] = this.createdAt
         user['money'] = this.money
         user['diamond'] = this.diamond
 
@@ -92,7 +92,7 @@ export default class User {
     }
 
     static async create(callback) {
-        const request = 'INSERT INTO users (public_key, private_key, money) values ($1, $2, $3) RETURNING public_key, private_key, money, created'
+        const request = "INSERT INTO users (public_key, private_key, money) values ($1, $2, $3) RETURNING public_key, private_key, money"
         const values = [generatePublicKey(11), generatePrivateKey(30), 100000]
         pool.query(request, values, (err, res) => {
             if (err) throw err
