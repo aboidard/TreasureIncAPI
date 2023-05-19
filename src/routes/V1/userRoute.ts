@@ -1,9 +1,8 @@
-import express from 'express'
-
+import { Router } from 'express';
 import logger from '../../config/logger'
 import User from '../../models/user'
 
-const router = express.Router();
+const router = Router();
 
 router.get('/login/:publicKey', (req, res) => {
 
@@ -11,7 +10,7 @@ router.get('/login/:publicKey', (req, res) => {
 
     logger.info(`request login ${req.params.publicKey} ${private_key}`)
 
-    User.get(req.params.publicKey, private_key, function (user) {
+    User.get(req.params.publicKey, private_key as string, function (user) {
         if (user != undefined) {
             res.status(200).send(user.getUserJson())
         }

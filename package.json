@@ -2,12 +2,13 @@
   "name": "treasure-inc-api",
   "version": "0.0.4",
   "description": "",
-  "main": "server.js",
-  "type": "module",
+  "main": "server.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --es-module-specifier-resolution=node server.js",
-    "dev": "nodemon --es-module-specifier-resolution=node --require dotenv/config server.js"
+    "test": "jest --es-module-specifier-resolution=node",
+    "build": "rimraf ./dist && tsc",
+    "build-prod": "tsc",
+    "clean": "rimraf ./dist",
+    "dev": "nodemon --require dotenv/config src/server.ts"
   },
   "repository": {
     "type": "git",
@@ -16,6 +17,7 @@
   "author": "Boidard Arnaud",
   "license": "ISC",
   "dependencies": {
+    "@types/pg": "^8.6.6",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
@@ -25,5 +27,13 @@
     "nodemon": "^2.0.19",
     "pg": "^8.6.0",
     "winston": "^3.8.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.1.0",
+    "@types/validator": "^13.7.15",
+    "rimraf": "^5.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
   }
 }

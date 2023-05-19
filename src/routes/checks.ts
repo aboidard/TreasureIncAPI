@@ -1,11 +1,11 @@
-import dotenv from 'dotenv'
-import express from 'express'
+import * as dotenv from 'dotenv'
+import { Router } from 'express';
 import logger from '../config/logger'
-import healthcheck from '../services/healthcheck'
+import { healthcheck } from '../services/healthcheck'
 
 dotenv.config()
-const router = express.Router();
-const version = process.env.VERSION
+const router = Router();
+const version: string = process.env.VERSION as string;
 
 router.get('/version', (req, res) => {
     logger.info("request version")

@@ -1,9 +1,8 @@
-import express from 'express'
-
+import { Router } from 'express';
 import logger from '../../config/logger'
 import Expedition from '../../models/expedition'
 
-const router = express.Router();
+const router = Router();
 
 router.post('/user/:publicKey/expedition/', (req, res) => {
     logger.info("request add expedition")

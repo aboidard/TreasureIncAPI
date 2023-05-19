@@ -4,13 +4,22 @@ import { generatePublicKey, generatePrivateKey } from '../services/utils'
 
 
 export default class User {
-    constructor(row) {
-        this.id = row.id
-        this.publicKey = row.public_key
-        this.privateKey = row.private_key
-        this.money = row.money
-        this.diamond = row.diamond
-        this.createdAt = row.createdAt
+
+    private _id: number;
+    private _publicKey: string;
+    private _privateKey: string;
+    private _money: number;
+    private _diamond: number;
+    private _createdAt: Date;
+
+
+    constructor(row: any) {
+        this._id = row.id
+        this._publicKey = row.public_key
+        this._privateKey = row.private_key
+        this._money = row.money
+        this._diamond = row.diamond
+        this._createdAt = row.createdAt
     }
 
     get publicKey() {
@@ -52,8 +61,8 @@ export default class User {
     }
 
 
-    getUserJson() {
-        let user = {}
+    getUserJson(): string {
+        let user: any = {}
         user['publicKey'] = this.publicKey
         user['privateKey'] = this.privateKey
         user['createdAt'] = this.createdAt
@@ -64,42 +73,43 @@ export default class User {
         return JSON.stringify(user)
     }
 
-    static async get(publicKey, privateKey, callback) {
-        const request = 'SELECT * FROM users WHERE public_key = $1 AND private_key = $2'
-        const values = [publicKey, privateKey]
+    static async get(publicKey: string, privateKey: string, callback: any) {
+        const request = 'SELECT * FROM users WHERE public_key = $1 AND private_key = $2';
+        const values = [publicKey, privateKey];
         pool.query(request, values, (err, res) => {
-            if (err) throw err
+            if (err) throw err;
             if (res.rows.length != 0) {
-                callback(new User(res.rows[0]))
+                callback(new User(res.rows[0]));
             }
-            callback()
+            callback();
         })
     }
 
-    static async getAll(callback) {
-        const request = 'SELECT * FROM users'
-        const values = []
-        let arrayResult = []
+    static async getAll(callback: any) {
+        const request = 'SELECT * FROM users';
+        const values = [];
+        const arrayResult: Array<User> = [];
         pool.query(request, values, (err, res) => {
-            if (err) throw err
+            if (err) throw err;
             if (res.rows.length != 0) {
-                arrayResult = []
-                res.rows.forEach((e) => arrayResult.push(new User(e)))
-                callback(arrayResult)
+                arrayResult
+                const result: any[] = res.rows;
+                result.forEach((e: any) => arrayResult.push(new User(e)));
+                callback(arrayResult);
             }
-            callback()
+            callback();
         })
     }
 
     static async create(callback) {
-        const request = "INSERT INTO users (public_key, private_key, money) values ($1, $2, $3) RETURNING public_key, private_key, money"
-        const values = [generatePublicKey(11), generatePrivateKey(30), 100000]
+        const request = "INSERT INTO users (public_key, private_key, money) values ($1, $2, $3) RETURNING public_key, private_key, money";
+        const values = [generatePublicKey(11), generatePrivateKey(30), 100000];
         pool.query(request, values, (err, res) => {
-            if (err) throw err
+            if (err) throw err;
             if (res.rows.length != 0) {
-                callback(new User(res.rows[0]))
+                callback(new User(res.rows[0]));
             }
-            callback()
+            callback();
         })
     }
 }

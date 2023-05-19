@@ -1,43 +1,45 @@
-import pool from '../config/db'
-import logger from '../config/logger'
-import { computePageParams } from '../services/utils'
+import pool from '../config/db';
+import logger from '../config/logger';
+import { computePageParams } from '../services/utils';
 
 export default class Items {
+    private _items: any;
+
     constructor(rows) {
-        this.items = rows
+        this.items = rows;
     }
 
     get items() {
-        return this._items
+        return this._items;
     }
 
     set items(value) {
-        this._items = value
+        this._items = value;
     }
 
     getItemsJson() {
         return JSON.stringify(this.items)
     }
 
-    static async get(publicKey, page = 0, limit, callback) {
+    static async get(publicKey: string, page: number = 0, limit: number, callback: any) {
 
-        const [limitParam, offset] = computePageParams(page, limit)
+        const [limitParam, offset] = computePageParams(page, limit);
 
         logger.info(`get items (${publicKey}) limit : ${limitParam} | offset : ${offset}`)
         const request = `SELECT items.* FROM items, users
                          WHERE items.user_id = users.id
                             AND users.public_key = $1
                             ORDER BY items.id
-                            LIMIT $2 OFFSET $3`
+                            LIMIT $2 OFFSET $3`;
 
         const values = [publicKey, limitParam, offset]
         pool.query(request, values, (err, res) => {
-            if (err) throw err
+            if (err) throw err;
             if (res.rows.length != 0) {
-                callback(new Items(res.rows))
+                callback(new Items(res.rows));
             }
-            callback()
-        })
+            callback();
+        });
     }
 
     static async post(publicKey, items, callback) {
