@@ -2,15 +2,16 @@ import { format, createLogger, transports } from 'winston'
 
 export default createLogger({
     transports:
-        [new transports.File({
-            filename: 'logs/treasure-inc-api.log',
+        [/*new transports.File({
+            dirname: 'logs',
+            filename: 'treasure-inc-api.log',
             format: format.combine(
                 format.timestamp({ format: 'MMM-DD-YYYY HH:mm:ss' }),
                 format.align(),
                 format.printf(info => `${info.level}: ${[info.timestamp]}: ${info.message}`),
             )
-        }),
-        new transports.Console({})]
+        }),*/
+            new transports.Console({})]
 })
 
 if (process.env.NODE_ENV !== 'production') {

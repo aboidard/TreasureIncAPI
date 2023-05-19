@@ -2,7 +2,11 @@ import logger from '../config/logger'
 import pool from '../config/db'
 import { produce } from '../config/kafka'
 
-const healthcheck = async function (version, callback) {
+interface IHealthcheck {
+    (version: string, callback: any): Promise<any>;
+}
+
+export const healthcheck: IHealthcheck = async (version, callback) => {
     var timeout = 5000
     logger.info("healthcheck")
     console.log("--------------> healthcheck")
@@ -19,7 +23,7 @@ const healthcheck = async function (version, callback) {
     }
 
     let start = Date.now();
-    let promiseEngine = new Promise(function waitForEngine(resolve, reject) {
+    let promiseEngine = new Promise(function waitForEngine(this: unknown, resolve, reject) {
         if (check.engineStatus !== "KO") {
             console.log("engine OK")
             resolve("ok");
@@ -56,6 +60,3 @@ const healthcheck = async function (version, callback) {
         callback(500, check)
     }).finally(() => console.log("<-------------- end healthcheck"))
 }
-
-
-export default healthcheck

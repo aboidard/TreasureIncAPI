@@ -1,16 +1,16 @@
 
-import express from 'express'
+import { Router } from 'express';
 import logger from '../../config/logger'
 import Items from '../../models/items'
 import itemService from '../../services/itemService'
 
-const router = express.Router();
+const router = Router();
 
 router.get('/user/:publicKey/items/', (req, res) => {
     logger.info("request get items")
     //let private_key = req.get('X-PRIVATE-KEY')
 
-    Items.get(req.params.publicKey, req.query.page, req.query.limit, function (items) {
+    Items.get(req.params.publicKey as string, parseInt(req.query.page as string), parseInt(req.query.limit as string), function (items) {
         if (items != undefined) {
             res.setHeader('Content-Type', 'application/json');
             res.status(200).send(items.getItemsJson())
