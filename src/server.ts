@@ -6,7 +6,7 @@ import express from 'express';
 
 import checks from './routes/checks';
 import logger from './config/logger';
-import { consume } from './config/kafka';
+import { consume } from './config/redis';
 import userRoute from './routes/V1/userRoute';
 import itemRoute from './routes/V1/itemRoute';
 import expeditionRoute from './routes/V1/expeditionRoute';
