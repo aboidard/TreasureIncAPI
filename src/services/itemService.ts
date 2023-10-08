@@ -1,5 +1,5 @@
 import logger from '../config/logger'
-import { produce } from '../config/kafka'
+import { produce } from '../config/redis'
 
 const itemService = {
     addItem: async function (user, nb, callback) {

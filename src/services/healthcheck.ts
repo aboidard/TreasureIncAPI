@@ -1,6 +1,6 @@
 import logger from '../config/logger'
 import pool from '../config/db'
-import { produce } from '../config/kafka'
+import { produce } from '../config/redis'
 
 interface IHealthcheck {
     (version: string, callback: any): Promise<any>;
