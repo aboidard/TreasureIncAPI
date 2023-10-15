@@ -1,46 +1,46 @@
 import { Router } from 'express';
 import logger from '../../config/logger'
-import User from '../../models/user'
+import userService from '../../services/userService';
 
 const router = Router();
 
 router.get('/login/:publicKey', (req, res) => {
-
     let private_key = req.get('X-PRIVATE-KEY')
-
     logger.info(`request login ${req.params.publicKey} ${private_key}`)
 
-    User.get(req.params.publicKey, private_key as string, function (user) {
-        if (user != undefined) {
-            res.status(200).send(user.getUserJson())
+    userService.login(req.params.publicKey, private_key as string, function (result) {
+        if (result.status == 200) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).send(result.payload.user);
+        } else {
+            res.status(result.status).end(result.message);
         }
-        res.status(404).end()
     })
 })
 
 router.get('/users', (req, res) => {
-
-    //let private_key = req.get('X-PRIVATE-KEY')
-
     logger.info(`request users`)
 
-    User.getAll(function (arrayUsers) {
-        if (arrayUsers != undefined) {
-            res.status(200).send(arrayUsers)
+    userService.getAll(function (result) {
+        if (result.status == 200) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).send(result.payload.usersList);
+        } else {
+            res.status(result.status).end(result.message);
         }
-        res.status(404).end()
     })
 })
 
 router.get('/user/create/', (req, res) => {
     logger.info("request get new user")
 
-    User.create(function (user) {
-        if (user != undefined) {
+    userService.createUser(function (result) {
+        if (result.status == 201) {
             res.setHeader('Content-Type', 'application/json');
-            res.status(200).send(user.getUserJson())
+            res.status(201).send(result.payload.user);
+        } else {
+            res.status(result.status).end(result.message);
         }
-        res.status(204).end()
     })
 })
 

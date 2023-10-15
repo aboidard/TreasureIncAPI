@@ -23,19 +23,18 @@ router.get('/user/:publicKey/items/', (req, res) => {
 router.post('/user/:publicKey/items/', (req, res) => {
     logger.info("request post items")
     if (req.body === undefined || req.body.length === 0) {
-        res.status(204).end()
-    } else {
-        logger.info(`req.body ${req.body}`)
-        //Items.post(req.params.publicKey, req.body, function (items) {
-        itemService.addItem(req.params.publicKey, req.body.nb, function (result) {
-            if (result.status == 201) {
-                res.setHeader('Content-Type', 'application/json')
-                res.status(201).send(result.payload.items)
-            } else {
-                res.status(result.status).end(result.message)
-            }
-        })
+        res.status(204).end();
+        return;
     }
+    logger.info(`req.body ${req.body}`);
+    itemService.addItem(req.params.publicKey, req.body.nb, function (result) {
+        if (result.status == 201) {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(201).send(result.payload.items);
+        } else {
+            res.status(result.status).end(result.message);
+        }
+    })
 })
 
 router.post('/user/:publicKey/sellitems/', (req, res) => {

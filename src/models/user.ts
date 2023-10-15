@@ -1,6 +1,5 @@
 import pool from '../config/db'
 import logger from '../config/logger'
-import { generatePublicKey, generatePrivateKey } from '../services/utils'
 
 
 export default class User {
@@ -76,34 +75,6 @@ export default class User {
     static async get(publicKey: string, privateKey: string, callback: any) {
         const request = 'SELECT * FROM users WHERE public_key = $1 AND private_key = $2';
         const values = [publicKey, privateKey];
-        pool.query(request, values, (err, res) => {
-            if (err) throw err;
-            if (res.rows.length != 0) {
-                callback(new User(res.rows[0]));
-            }
-            callback();
-        })
-    }
-
-    static async getAll(callback: any) {
-        const request = 'SELECT * FROM users';
-        const values = [];
-        const arrayResult: Array<User> = [];
-        pool.query(request, values, (err, res) => {
-            if (err) throw err;
-            if (res.rows.length != 0) {
-                arrayResult
-                const result: any[] = res.rows;
-                result.forEach((e: any) => arrayResult.push(new User(e)));
-                callback(arrayResult);
-            }
-            callback();
-        })
-    }
-
-    static async create(callback) {
-        const request = "INSERT INTO users (public_key, private_key, money) values ($1, $2, $3) RETURNING public_key, private_key, money";
-        const values = [generatePublicKey(11), generatePrivateKey(30), 100000];
         pool.query(request, values, (err, res) => {
             if (err) throw err;
             if (res.rows.length != 0) {
