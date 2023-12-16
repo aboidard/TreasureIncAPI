@@ -10,6 +10,8 @@ export default class User {
     private _money: number;
     private _diamond: number;
     private _createdAt: Date;
+    private _updatedAt: Date;
+    private _lastLogin: Date;
 
 
     constructor(row: any) {
@@ -19,6 +21,8 @@ export default class User {
         this._money = row.money
         this._diamond = row.diamond
         this._createdAt = row.createdAt
+        this._updatedAt = row.updatedAt
+        this._lastLogin = row.lastLogin
     }
 
     get publicKey() {
@@ -39,7 +43,12 @@ export default class User {
     get diamond() {
         return this._diamond
     }
-
+    get lastLogin() {
+        return this._lastLogin
+    }
+    get updatedAt() {
+        return this._updatedAt
+    }
     set id(value) {
         this._id = value
     }
@@ -58,6 +67,12 @@ export default class User {
     set createdAt(value) {
         this._createdAt = value
     }
+    set updatedAt(value) {
+        this._updatedAt = value
+    }
+    set lastLogin(value) {
+        this._createdAt = value
+    }
 
 
     getUserJson(): string {
@@ -65,8 +80,10 @@ export default class User {
         user['publicKey'] = this.publicKey
         user['privateKey'] = this.privateKey
         user['createdAt'] = this.createdAt
+        user['updatedAt'] = this.updatedAt
         user['money'] = this.money
         user['diamond'] = this.diamond
+        user['lastLogin'] = this.diamond
 
         logger.info(JSON.stringify(user))
         return JSON.stringify(user)

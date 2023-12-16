@@ -62,7 +62,7 @@ export const consume = async () => {
 
     consumer.on("connect", function () {
         console.log("Redis connected");
-        subscribe(topic);
+        subscribe(topicResponse);
     });
 
     consumer.on("reconnecting", function () {

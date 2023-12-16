@@ -18,7 +18,7 @@ router.get('/login/:publicKey', (req, res) => {
     })
 })
 
-router.get('/users', (req, res) => {
+/*router.get('/users', (req, res) => {
     logger.info(`request users`)
 
     userService.getAll(function (result) {
@@ -29,7 +29,7 @@ router.get('/users', (req, res) => {
             res.status(result.status).end(result.message);
         }
     })
-})
+})*/
 
 router.get('/user/create/', (req, res) => {
     logger.info("request get new user")
