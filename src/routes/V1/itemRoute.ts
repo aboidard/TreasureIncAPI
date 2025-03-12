@@ -22,12 +22,14 @@ router.get('/user/:publicKey/items/', (req, res) => {
 
 router.post('/user/:publicKey/items/', (req, res) => {
     logger.info("request post items")
+    let privateKey = req.get('X-PRIVATE-KEY')
+
     if (req.body === undefined || req.body.length === 0) {
         res.status(204).end();
         return;
     }
     logger.info(`req.body ${req.body}`);
-    itemService.addItem(req.params.publicKey, req.body.nb, function (result) {
+    itemService.addItem(req.params.publicKey, req.body.nb, privateKey as string, function (result) {
         if (result.status == 201) {
             res.setHeader('Content-Type', 'application/json');
             res.status(201).send(result.payload.items);

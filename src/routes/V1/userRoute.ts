@@ -6,7 +6,7 @@ const router = Router();
 
 router.get('/login/:publicKey', (req, res) => {
     let private_key = req.get('X-PRIVATE-KEY')
-    logger.info(`request login ${req.params.publicKey} ${private_key}`)
+    logger.info(`request login ${req.params.publicKey}`)
 
     userService.login(req.params.publicKey, private_key as string, function (result) {
         if (result.status == 200) {
