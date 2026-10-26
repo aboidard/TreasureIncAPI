@@ -9,7 +9,8 @@ dotenv.config();
 const topic = "message-log"
 const topicResponse = "message-log-res"
 
-const callbacks = Object.create([]);
+// pending requests, by replyId; an entry is removed on reply or timeout
+const callbacks: Record<string, (payload: any) => void> = {};
 const redisConf = {
     port: process.env.REDIS_PORT,
     host: process.env.REDIS_HOST,
@@ -45,7 +46,7 @@ export const consume = async () => {
                 callback(result.payload)
             } catch (err) {
                 logger.error(`consume : could not read message ${err}`)
-                callback({ status: "500", message: `could not read message : ${err}` })
+                callback({ status: 500, message: `could not read message : ${err}` })
             }
         } catch (err) {
             console.error(`could not read message ${err}`)
@@ -70,14 +71,37 @@ export const consume = async () => {
     });
 }
 
-export const produce = async (payload, callback) => {
-    try {
-        const replyId = generateRandomString(10)
-        callbacks[replyId] = callback;
-        await producer.publish(topic, JSON.stringify({ replyId: replyId, payload: payload }));
-        // if the message is written successfully, log it
-        logger.info(`message sent ${replyId} | ${payload}`)
-    } catch (err) {
-        logger.error(`could not write message ${err}`)
+export class EngineTimeoutError extends Error {
+    constructor(type: string, timeoutMs: number) {
+        super(`engine did not answer "${type}" within ${timeoutMs} ms`);
     }
 }
+
+/**
+ * Sends a request to the engine and resolves with its reply payload ({status, message, payload}, or {error}).
+ * Rejects with EngineTimeoutError when the engine does not answer in time.
+ */
+export const request = (type: string, params: object = {}, timeoutMs = 5000): Promise<any> =>
+    new Promise((resolve, reject) => {
+        const replyId = generateRandomString(10)
+        const done = () => {
+            clearTimeout(timer)
+            delete callbacks[replyId]
+        }
+        const timer = setTimeout(() => {
+            done()
+            logger.error(`no reply for ${replyId} | ${type}`)
+            reject(new EngineTimeoutError(type, timeoutMs))
+        }, timeoutMs)
+        callbacks[replyId] = (payload) => {
+            done()
+            resolve(payload)
+        }
+        producer.publish(topic, JSON.stringify({ replyId: replyId, payload: { type: type, params: params } }))
+            .then(() => logger.info(`message sent ${replyId} | ${type}`))
+            .catch((err) => {
+                done()
+                logger.error(`could not write message ${err}`)
+                reject(err)
+            })
+    })

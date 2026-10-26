@@ -1,18 +1,19 @@
 import logger from '../config/logger'
-import { produce } from '../config/redis'
+import { request } from '../config/redis'
+import { EngineReply } from './engine'
 
 const userService = {
-    login: async function (user, privateKey, callback) {
+    login: async function (user: string, privateKey: string | undefined): Promise<EngineReply> {
         logger.info(`user | user ${user}`)
-        produce({ type: "login", params: { user: user, private_key: privateKey } }, callback)
+        return request("login", { user: user, private_key: privateKey })
     },
-    createUser: async function (callback) {
+    createUser: async function (): Promise<EngineReply> {
         logger.info(`createUser`)
-        produce({ type: "createUser" }, callback)
+        return request("createUser")
     },
-    getAll: async function (callback) {
-        logger.info(`getAll`)
-        produce({ type: "getAllUsers" }, callback)
+    startExpedition: async function (user: string, privateKey: string | undefined, cost): Promise<EngineReply> {
+        logger.info(`user | expedition for ${user}, cost : ${cost}`)
+        return request("startExpedition", { user: user, private_key: privateKey, cost: cost })
     }
 }
 
