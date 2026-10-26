@@ -13,9 +13,7 @@ router.get('/version', (req, res) => {
 })
 
 router.get('/healthcheck', (_, res) => {
-    healthcheck(version, function (status, message) {
-        res.status(status).send(message)
-    })
+    healthcheck(version).then(([status, message]) => res.status(status).send(message))
 })
 
 export default router

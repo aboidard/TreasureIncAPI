@@ -1,62 +1,36 @@
 import logger from '../config/logger'
-import pool from '../config/db'
-import { produce } from '../config/redis'
+import { request } from '../config/redis'
 
-interface IHealthcheck {
-    (version: string, callback: any): Promise<any>;
+interface Check {
+    name: string
+    status: string
 }
 
-export const healthcheck: IHealthcheck = async (version, callback) => {
-    var timeout = 5000
-    logger.info("healthcheck")
-    console.log("--------------> healthcheck")
+/** "OK" when the engine reports its database check as UP; otherwise that check's status, or "unknown". */
+const dbStatus = (checks: Check[] | undefined): string => {
+    const db = (checks ?? []).find((c) => /postgres|database/i.test(c.name))
+    if (!db) return "unknown"
+    return db.status === "UP" ? "OK" : db.status
+}
 
-    //result to send
-    let check = {
+/**
+ * Version, engine status and database status (as seen by the engine: the API has no database access).
+ * Always answers 200, the statuses telling what is down.
+ */
+export const healthcheck = async (version: string): Promise<[number, object]> => {
+    logger.info("healthcheck")
+    const check: { version: string, dbStatus: string, engineStatus: any } = {
         version: version,
         dbStatus: "KO",
         engineStatus: "KO"
     }
-
-    const funcEngine = async function (payload) {
-        check.engineStatus = payload
+    try {
+        const reply = await request("healthcheck")
+        check.engineStatus = reply
+        check.dbStatus = dbStatus(reply.checks)
+    } catch (err: any) {
+        check.engineStatus = `KO: ${err.message}`
+        check.dbStatus = "unknown (engine unreachable)"
     }
-
-    let start = Date.now();
-    let promiseEngine = new Promise(function waitForEngine(this: unknown, resolve, reject) {
-        if (check.engineStatus !== "KO") {
-            console.log("engine OK")
-            resolve("ok");
-        }
-        else if (timeout && (Date.now() - start) >= timeout) {
-            console.log("timeout")
-            reject("timeout")
-        }
-        else {
-            console.log("wait engine")
-            setTimeout(waitForEngine.bind(this, resolve, reject), 30)
-        }
-    })
-
-    let promiseDb = pool.connect()
-
-    //check engine
-    produce({ type: "healthcheck", params: {} }, funcEngine)
-
-    //check DB
-    promiseDb.then((value) => {
-        check.dbStatus = "OK"
-        value.release()
-    }).catch(err => {
-        check.dbStatus = "connection error " + err.message
-    })
-
-    //waiting for Engine and DB
-    Promise.allSettled([promiseDb, promiseEngine]).then(() => {
-        callback(200, check)
-    }).catch((value) => {
-        value.forEach((value) => console.log(value.status))
-        check.engineStatus = value
-        callback(500, check)
-    }).finally(() => console.log("<-------------- end healthcheck"))
+    return [200, check]
 }
