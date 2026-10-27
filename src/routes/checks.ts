@@ -3,7 +3,7 @@ import { Router } from 'express';
 import logger from '../config/logger'
 import { healthcheck } from '../services/healthcheck'
 
-dotenv.config()
+dotenv.config({ quiet: true })
 const router = Router();
 const version: string = process.env.VERSION as string;
 

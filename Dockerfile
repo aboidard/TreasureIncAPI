@@ -1,4 +1,4 @@
-FROM node:16-alpine as builder
+FROM node:24-alpine AS builder
 
 # Global npm dependencies
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
@@ -13,7 +13,7 @@ COPY . .
 
 RUN yarn build-prod
 
-FROM node:16-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 

@@ -11,7 +11,7 @@ import expeditionRoute from './routes/V1/expeditionRoute';
 const cors = require('cors');
 
 // loading conf
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const port = process.env.SERVER_PORT
 
