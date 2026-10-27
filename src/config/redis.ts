@@ -4,7 +4,7 @@ import logger from './logger';
 import * as dotenv from 'dotenv';
 
 // loading conf
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const topic = "message-log"
 const topicResponse = "message-log-res"
@@ -14,7 +14,9 @@ const callbacks: Record<string, (payload: any) => void> = {};
 const redisConf = {
     port: process.env.REDIS_PORT,
     host: process.env.REDIS_HOST,
-    password: process.env.REDIS_PASSWORD
+    password: process.env.REDIS_PASSWORD,
+    // ioredis 6 speaks RESP3 by default: keep the RESP2 protocol of ioredis 5 for the pub/sub with the engine
+    protocol: 2
 };
 const consumer = new Redis(redisConf);
 const producer = new Redis(redisConf);
