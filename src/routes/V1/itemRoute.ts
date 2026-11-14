@@ -12,10 +12,10 @@ router.get('/user/:publicKey/items/', (req, res) => {
         parseInt(req.query.page as string), parseInt(req.query.limit as string)), (payload) => payload.items)
 })
 
-// body {nb}: generates nb items, answers 201 with the new items
+// body {expeditionId}: opens the chest of the expedition, answers 201 with the new items; 404 once it is opened
 router.post('/user/:publicKey/items/', (req, res) => {
     logger.info("request post items")
-    respond(res, itemService.addItems(req.params.publicKey, req.get('X-PRIVATE-KEY'), req.body?.nb),
+    respond(res, itemService.addItems(req.params.publicKey, req.get('X-PRIVATE-KEY'), req.body?.expeditionId),
         (payload) => payload.items, 201)
 })
 
