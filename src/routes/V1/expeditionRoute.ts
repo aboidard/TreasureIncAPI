@@ -5,10 +5,19 @@ import userService from '../../services/userService'
 
 const router = Router();
 
-// body {cost}: takes the cost from the balance, answers {money}; 402 when the balance is too low
+// body {location, caseId, cost}: reveals a case, answers {rarity, money}; 402 when the balance is too low
+router.post('/user/:publicKey/expedition/dig/', (req, res) => {
+    logger.info("request dig case")
+    respond(res, userService.digCase(req.params.publicKey, req.get('X-PRIVATE-KEY'),
+        req.body?.location, req.body?.caseId, req.body?.cost))
+})
+
+// body {location, difficulty, caseId?}: pays for the expedition, answers {expeditionId, money, itemCount};
+// 402 when the balance is too low
 router.post('/user/:publicKey/expedition/', (req, res) => {
     logger.info("request add expedition")
-    respond(res, userService.startExpedition(req.params.publicKey, req.get('X-PRIVATE-KEY'), req.body?.cost))
+    respond(res, userService.startExpedition(req.params.publicKey, req.get('X-PRIVATE-KEY'),
+        req.body?.location, req.body?.difficulty, req.body?.caseId))
 })
 
 export default router

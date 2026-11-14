@@ -31,9 +31,9 @@ const itemService = {
             }
         }
     },
-    addItems: async function (user: string, privateKey: string | undefined, nb): Promise<EngineReply> {
-        logger.info(`item | generate for ${user}, nb : ${nb}`)
-        return request("generateItemsForUser", { user: user, private_key: privateKey, nb: nb })
+    addItems: async function (user: string, privateKey: string | undefined, expeditionId): Promise<EngineReply> {
+        logger.info(`item | generate for ${user}, expedition : ${expeditionId}`)
+        return request("generateItemsForUser", { user: user, private_key: privateKey, expedition_id: expeditionId })
     },
     sellItems: async function (user: string, privateKey: string | undefined, items): Promise<EngineReply> {
         logger.info(`item | sell for ${user} : ${JSON.stringify(items)}`)
