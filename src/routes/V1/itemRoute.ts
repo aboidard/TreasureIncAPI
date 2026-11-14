@@ -5,7 +5,8 @@ import itemService from '../../services/itemService'
 
 const router = Router();
 
-// JSON array of items; ?page (0-based) & ?limit for one page, every item otherwise
+// JSON array of the items of the inventory (those equipped on a character are left out); ?page (0-based) & ?limit
+// for one page, every item otherwise. An equipable item has its "stats": {slot, for, con, luk, spe1...}
 router.get('/user/:publicKey/items/', (req, res) => {
     logger.info("request get items")
     respond(res, itemService.getItems(req.params.publicKey, req.get('X-PRIVATE-KEY'),
