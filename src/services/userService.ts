@@ -15,9 +15,9 @@ const userService = {
         logger.info(`user | dig for ${user}, location : ${location}, case : ${caseId}, cost : ${cost}`)
         return request("digCase", { user: user, private_key: privateKey, location: location, case_id: caseId, cost: cost })
     },
-    startExpedition: async function (user: string, privateKey: string | undefined, location, difficulty, caseId): Promise<EngineReply> {
-        logger.info(`user | expedition for ${user}, location : ${location}, difficulty : ${difficulty}, case : ${caseId}`)
-        return request("startExpedition", { user: user, private_key: privateKey, location: location, difficulty: difficulty, case_id: caseId })
+    startExpedition: async function (user: string, privateKey: string | undefined, location, difficulty, caseId, character): Promise<EngineReply> {
+        logger.info(`user | expedition for ${user}, location : ${location}, difficulty : ${difficulty}, case : ${caseId}, character : ${character}`)
+        return request("startExpedition", { user: user, private_key: privateKey, location: location, difficulty: difficulty, case_id: caseId, character: character })
     }
 }
 
