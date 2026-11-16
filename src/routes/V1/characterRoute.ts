@@ -6,7 +6,7 @@ import characterService from '../../services/characterService'
 const router = Router();
 
 // The routes below answer the characters of the user:
-// [{num, name, rank, stats, copies, expeditionId, equipment: {"<slot>": item}}].
+// [{num, name, rank, stats, skills, combat, level, xp, xpNext, copies, expeditionId, equipment: {"<slot>": item}}].
 // expeditionId is null unless the character is on an expedition; the slot numbers are those of the engine README.
 const characters = (payload) => payload.characters
 
