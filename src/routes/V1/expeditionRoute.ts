@@ -14,8 +14,9 @@ router.post('/user/:publicKey/expedition/dig/', (req, res) => {
 })
 
 // body {location, difficulty, character, caseId?}: pays for the expedition led by the character (its number),
-// answers {expeditionId, character, money, itemCount}; 402 when the balance is too low, 409 when the character is
-// already on an expedition
+// answers {expeditionId, character, money, itemCount, xp, run}; 402 when the balance is too low, 409 when the
+// character is already on an expedition. run is what happens to the character on the way, decided by the engine:
+// {maxHp, floorsCompleted, dead, floors: [{encounters: [{type, position, hp, duration, monster?, fight?}], healed, hpEnd}]}
 router.post('/user/:publicKey/expedition/', (req, res) => {
     logger.info("request add expedition")
     respond(res, userService.startExpedition(req.params.publicKey, req.get('X-PRIVATE-KEY'),
