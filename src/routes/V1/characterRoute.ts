@@ -5,7 +5,8 @@ import characterService from '../../services/characterService'
 
 const router = Router();
 
-// Every route answers the characters of the user: [{num, expeditionId, equipment: {"<slot>": item}}].
+// The routes below answer the characters of the user:
+// [{num, name, rank, stats, copies, expeditionId, equipment: {"<slot>": item}}].
 // expeditionId is null unless the character is on an expedition; the slot numbers are those of the engine README.
 const characters = (payload) => payload.characters
 
@@ -28,6 +29,21 @@ router.post('/user/:publicKey/characters/:num/unequip/', (req, res) => {
     logger.info("request unequip item")
     respond(res, characterService.unequipItem(req.params.publicKey, req.get('X-PRIVATE-KEY'),
         parseInt(req.params.num), req.body?.slot), characters)
+})
+
+// the portals the characters are summoned from: [{id, name, cost, multi, rates: [{rank, percent}], characters}]
+router.get('/portals/', (req, res) => {
+    logger.info("request get portals")
+    respond(res, characterService.getPortals(), (payload) => payload.portals)
+})
+
+// body {portal, count}: draws 1 or "multi" characters in the portal, answers {draws, money, characters} where
+// draws is [{num, name, rank, stats, isNew, copies}] in the order they were made; 402 when the balance is too low,
+// 404 when the portal does not exist
+router.post('/user/:publicKey/recruit/', (req, res) => {
+    logger.info("request recruit")
+    respond(res, characterService.recruit(req.params.publicKey, req.get('X-PRIVATE-KEY'),
+        req.body?.portal, req.body?.count))
 })
 
 export default router

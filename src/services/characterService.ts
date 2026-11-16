@@ -14,6 +14,14 @@ const characterService = {
     unequipItem: async function (user: string, privateKey: string | undefined, character: number, slot): Promise<EngineReply> {
         logger.info(`character | unequip for ${user}, character : ${character}, slot : ${slot}`)
         return request("unequipItem", { user: user, private_key: privateKey, character: character, slot: slot })
+    },
+    getPortals: async function (): Promise<EngineReply> {
+        logger.info(`character | portals`)
+        return request("getPortals", {})
+    },
+    recruit: async function (user: string, privateKey: string | undefined, portal, count): Promise<EngineReply> {
+        logger.info(`character | recruit for ${user}, portal : ${portal}, count : ${count}`)
+        return request("recruit", { user: user, private_key: privateKey, portal: portal, count: count })
     }
 }
 
