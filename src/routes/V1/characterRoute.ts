@@ -31,14 +31,16 @@ router.post('/user/:publicKey/characters/:num/unequip/', (req, res) => {
         parseInt(req.params.num), req.body?.slot), characters)
 })
 
-// the portals the characters are summoned from: [{id, name, cost, multi, rates: [{rank, percent}], characters}]
+// the portals the characters are summoned from: [{id, name, cost, currency, multi, rates: [{rank, percent}],
+// characters}]; cost is the price of one draw in gems (currency "gems")
 router.get('/portals/', (req, res) => {
     logger.info("request get portals")
     respond(res, characterService.getPortals(), (payload) => payload.portals)
 })
 
-// body {portal, count}: draws 1 or "multi" characters in the portal, answers {draws, money, characters} where
-// draws is [{num, name, rank, stats, isNew, copies}] in the order they were made; 402 when the balance is too low,
+// body {portal, count}: draws 1 or "multi" characters in the portal, paid in gems, answers {draws, gems, characters}
+// where draws is [{num, name, rank, stats, isNew, copies}] in the order they were made and gems the new balance of
+// gems; 402 {gems} when the user has not enough gems,
 // 404 when the portal does not exist
 router.post('/user/:publicKey/recruit/', (req, res) => {
     logger.info("request recruit")

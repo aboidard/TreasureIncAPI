@@ -9,6 +9,7 @@ import itemRoute from './routes/V1/itemRoute';
 import expeditionRoute from './routes/V1/expeditionRoute';
 import characterRoute from './routes/V1/characterRoute';
 import questRoute from './routes/V1/questRoute';
+import giftRoute from './routes/V1/giftRoute';
 
 const cors = require('cors');
 
@@ -41,6 +42,7 @@ app.use('/V1/', itemRoute);
 app.use('/V1/', expeditionRoute);
 app.use('/V1/', characterRoute);
 app.use('/V1/', questRoute);
+app.use('/V1/', giftRoute);
 
 // start the consumer, and log any errors
 consume().catch((err) => {
