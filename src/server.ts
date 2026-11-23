@@ -10,6 +10,8 @@ import expeditionRoute from './routes/V1/expeditionRoute';
 import characterRoute from './routes/V1/characterRoute';
 import questRoute from './routes/V1/questRoute';
 import giftRoute from './routes/V1/giftRoute';
+import eventRoute from './routes/V1/eventRoute';
+import { maintenanceGuard } from './services/settings';
 
 const cors = require('cors');
 
@@ -37,12 +39,15 @@ app.use(cors({
 
 // routes setup
 app.use('/', checks);
+// the game routes: refused during a maintenance, without reaching the engine
+app.use('/V1/', maintenanceGuard);
 app.use('/V1/', userRoute);
 app.use('/V1/', itemRoute);
 app.use('/V1/', expeditionRoute);
 app.use('/V1/', characterRoute);
 app.use('/V1/', questRoute);
 app.use('/V1/', giftRoute);
+app.use('/V1/', eventRoute);
 
 // start the consumer, and log any errors
 consume().catch((err) => {

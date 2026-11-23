@@ -79,6 +79,9 @@ export class EngineTimeoutError extends Error {
     }
 }
 
+/** Reads a Redis string key (null when absent). Uses the producer: the consumer connection is in subscriber mode. */
+export const getValue = (key: string): Promise<string | null> => producer.get(key)
+
 /**
  * Sends a request to the engine and resolves with its reply payload ({status, message, payload}, or {error}).
  * Rejects with EngineTimeoutError when the engine does not answer in time.
