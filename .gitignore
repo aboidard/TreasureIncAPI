@@ -117,3 +117,5 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+# load test results
+load-tests/results/
