@@ -6,3 +6,5 @@ node_modules
 API.code-workspace
 README.md
 .env
+
+load-tests
